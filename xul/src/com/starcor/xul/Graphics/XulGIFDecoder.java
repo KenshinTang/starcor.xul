@@ -2,6 +2,7 @@ package com.starcor.xul.Graphics;
 
 import android.graphics.AvoidXfermode;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Xfermode;
@@ -108,6 +109,17 @@ public class XulGIFDecoder {
 			p.setXfermode(xfermode);
 			dc.restore();
 		}
+
+		public void draw(Canvas canvas, int x1, int y1, int w1, int h1, float x2, float y2, float w2, float h2, Paint p) {
+			if (!_isCurrentFrameDecoded) {
+				decodeFrame();
+			}
+			canvas.save();
+			Xfermode xfermode = p.setXfermode(_colorKeyXferMode);
+			XulDC.drawBitmap(canvas, _frameImage, x1, y1, w1, h1, x2, y2, w2, h2, p);
+			p.setXfermode(xfermode);
+			canvas.restore();
+		}
 	}
 
 	public static class GIFStaticRender {
@@ -147,7 +159,7 @@ public class XulGIFDecoder {
 	public static GIFAnimationRender createAnimationRenderer(GIFFrame[] gifFrames, boolean noLoop, boolean noTransparent) {
 		GIFAnimationRender render = new GIFAnimationRender();
 		GIFFrame gifFrame0 = gifFrames[0];
-		render._frameImage = BitmapTools.createBitmapFromRecycledBitmaps(gifFrame0._screenW, gifFrame0._screenH, Bitmap.Config.ARGB_8888);
+		render._frameImage = BitmapTools.createBitmap(gifFrame0._screenW, gifFrame0._screenH, Bitmap.Config.ARGB_8888);
 		render._gifFrames = gifFrames;
 		render._isCurrentFrameDecoded = false;
 		render._currentFrame = 0;
@@ -165,7 +177,7 @@ public class XulGIFDecoder {
 		GIFStaticRender render = new GIFStaticRender();
 		GIFFrame gifFrame0 = gifFrames[0];
 		if (noTransparent) {
-			render._frameImage = BitmapTools.createBitmapFromRecycledBitmaps(gifFrame0._screenW, gifFrame0._screenH, Bitmap.Config.ARGB_8888);
+			render._frameImage = BitmapTools.createBitmap(gifFrame0._screenW, gifFrame0._screenH, Bitmap.Config.ARGB_8888);
 		} else {
 			render._frameImage = BitmapTools.createBitmap(gifFrame0._screenW, gifFrame0._screenH, Bitmap.Config.ARGB_8888);
 		}
